@@ -91,13 +91,13 @@ def main():
     phonelist = readwechatid(file_path)
     phonelist = list(set(phonelist))
     # 点击右上角+号
-    d(resourceId="com.tencent.mm:id/ky9").click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/ky9"]').click()
     time.sleep(1)
     #  点击添加好友
     d.xpath('//android.widget.ListView/android.widget.LinearLayout[2]/android.widget.ImageView[1]').click()
     time.sleep(1)
     # 聚焦输入框
-    d(resourceId="com.tencent.mm:id/mes").click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/mes"]').click()
     time.sleep(1)
     count = 0
     notfound = 1
@@ -137,5 +137,5 @@ if __name__ == '__main__':
     verifyContent = '您好，低价飞天茅台质量99.9%,对标正品，降低招待成本，提升饭桌规格！'
     # 主程序
     file_path = './freshId.txt'
-    getwechatid(60, file_path)
+    getwechatid(120, file_path)
     main()
