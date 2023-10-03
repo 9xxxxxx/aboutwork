@@ -6,7 +6,7 @@ import os
 d = u2.connect()
 
 
-# 读取wechatid 60一组
+# 读取wechatid
 def getwechatid(number, filepath):
     if os.path.getsize(filepath):
         return
@@ -137,5 +137,5 @@ if __name__ == '__main__':
     verifyContent = '您好，低价飞天茅台质量99.9%,对标正品，降低招待成本，提升饭桌规格！'
     # 主程序
     file_path = './freshId.txt'
-    getwechatid(120, file_path)
+    getwechatid(360, file_path)
     main()
