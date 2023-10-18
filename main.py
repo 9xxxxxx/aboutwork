@@ -7,19 +7,19 @@ d = u2.connect()
 
 
 # 读取wechatid
-def getwechatid(number, filepath):
+def getwechatid(number, filepath, wechatid):
     if os.path.getsize(filepath):
         return
-    idlist = readwechatid(r'newid.txt')
+    idlist = readwechatid(wechatid)
     worklist = []
     for i in range(number):
         idnumber = idlist.pop()
         worklist.append(idnumber)
-    with open('newid.txt', 'w+', encoding='utf-8') as file:
+    with open(wechatid, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in idlist:
             file.write(i + '\n')
-    with open('freshId.txt', 'w+', encoding='utf-8') as file:
+    with open(filepath, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in worklist:
             file.write(i + '\n')
@@ -137,5 +137,6 @@ if __name__ == '__main__':
     verifyContent = '您好，低价飞天茅台质量99.9%,对标正品，降低招待成本，提升饭桌规格！'
     # 主程序
     file_path = './freshId.txt'
-    getwechatid(360, file_path)
+    wechatid = './WeChatid.txt'
+    getwechatid(124, file_path,wechatid)
     main()
