@@ -1,24 +1,25 @@
 # coding: utf-8
 import time
+
 import uiautomator2 as u2
 import os
 d = u2.connect()
 
 
-# 读取wechatid 60一组
-def getwechatid(number, filepath):
+# 读取wechatid
+def getwechatid(number, filepath, wechatid):
     if os.path.getsize(filepath):
         return
-    idlist = readwechatid(r'newid.txt')
+    idlist = readwechatid(wechatid)
     worklist = []
     for i in range(number):
         idnumber = idlist.pop()
         worklist.append(idnumber)
-    with open('newid.txt', 'w+', encoding='utf-8') as file:
+    with open(wechatid, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in idlist:
             file.write(i + '\n')
-    with open('freshId.txt', 'w+', encoding='utf-8') as file:
+    with open(filepath, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in worklist:
             file.write(i + '\n')
@@ -49,33 +50,31 @@ def addfriends(wechatid, success, found):
     #     print(f'this id ({wechatid}) already added')
     #     return
     # 点击账号输入框激活输入，聚焦输入光标
-    d(resourceId="com.tencent.mm:id/eg6").click()
-    time.sleep(1)
+    # d(resourceId="com.tencent.mm:id/eg6").click()
     # 输入要添加的号码
-    d.xpath('//*[@resource-id="com.tencent.mm:id/eg6"]').set_text(wechatid)
+    d.xpath('//*[@resource-id="com.tencent.mm:id/gfl"]').set_text(wechatid)
     # #输入完毕点击下方出现的搜索:xxxxxxxxxxxx
-    d.xpath('//*[@resource-id="com.tencent.mm:id/j6x"]/android.widget.RelativeLayout[1]').click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/mfg"]/android.widget.RelativeLayout[1]').click()
     # 判断用户状态
     # 等待虚拟页面加载完毕
-    time.sleep(3)
+    time.sleep(2)
     if d(text='发消息').exists:
         print(wechatid + ' is already your friend!')
-        d.xpath('//*[@resource-id="com.tencent.mm:id/g1"]').click()
+        d.xpath('//*[@resource-id="com.tencent.mm:id/hf"]').click()
         return
     if not d(text='添加到通讯录').exists:
         print(wechatid + f"  该用户不存在! found:No.{found}")
         return
     # #点击接下来要进行的操作按钮 这里是点击添加到通讯录
-    d(resourceId="com.tencent.mm:id/khj").click()
+    d(resourceId="com.tencent.mm:id/o3b").click()
     # 设置好友申请内容
-    d(resourceId="com.tencent.mm:id/j0w").set_text(verifyContent)
-    time.sleep(2)
+    d(resourceId="com.tencent.mm:id/m9y").set_text(verifyContent)
+    time.sleep(1)
     # 点击发送
-    d(resourceId="com.tencent.mm:id/e9q").click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/g68"]').click()
     time.sleep(3)
     # 点击返回到添加好友页面
-    d.xpath('//*[@resource-id="com.tencent.mm:id/g1"]').click()
-    time.sleep(1)
+    d.press("back")
     print(wechatid + f' is add successfully! addSuccessful:No.{success}')
     return 1
 
@@ -92,13 +91,13 @@ def main():
     phonelist = readwechatid(file_path)
     phonelist = list(set(phonelist))
     # 点击右上角+号
-    d(resourceId="com.tencent.mm:id/hy6").click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/ky9"]').click()
     time.sleep(1)
     #  点击添加好友
-    d.xpath('//android.widget.ListView/android.widget.LinearLayout[2]').click()
+    d.xpath('//android.widget.ListView/android.widget.LinearLayout[2]/android.widget.ImageView[1]').click()
     time.sleep(1)
     # 聚焦输入框
-    d(resourceId="com.tencent.mm:id/j69").click()
+    d.xpath('//*[@resource-id="com.tencent.mm:id/mes"]').click()
     time.sleep(1)
     count = 0
     notfound = 1
@@ -116,8 +115,15 @@ def main():
             done_file.truncate(0)
             for i in phonelist:
                 done_file.write(i + '\n')
-            d(resourceId="com.tencent.mm:id/apy").click()
-            d(resourceId="com.tencent.mm:id/g1").click()
+            # 提示频繁或者出错 返回到微信主界面
+            if d(resourceId="com.tencent.mm:id/g68").exists:
+                d.press("back")
+                d.press("back")
+                d.press("back")
+                d.press("back")
+            else:
+                d.press("back")
+                d.press("back")
             print(f'this time add totally {count}')
             print(f'this time add successfully {success}')
             print('file modify successfully!')
@@ -131,5 +137,6 @@ if __name__ == '__main__':
     verifyContent = '您好，低价飞天茅台质量99.9%,对标正品，降低招待成本，提升饭桌规格！'
     # 主程序
     file_path = './freshId.txt'
-    getwechatid(60, file_path)
+    wechatid = './WeChatid.txt'
+    getwechatid(124, file_path,wechatid)
     main()

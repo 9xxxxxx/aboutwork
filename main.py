@@ -1,24 +1,27 @@
 # coding: utf-8
 import time
-
 import uiautomator2 as u2
 import os
 d = u2.connect()
 
 
 # 读取wechatid
-def getwechatid(number, filepath, wechatid):
+def getwechatid(number, filepath, wxid):
+
     if os.path.getsize(filepath):
         return
-    idlist = readwechatid(wechatid)
+    idlist = readwechatid(wxid)
     worklist = []
+
     for i in range(number):
-        idnumber = idlist.pop()
-        worklist.append(idnumber)
-    with open(wechatid, 'w+', encoding='utf-8') as file:
+        number = idlist.pop()
+        worklist.append(number)
+        # 剩余号码写回到原始文件
+    with open(wxid, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in idlist:
             file.write(i + '\n')
+        # 写入到工作源文件
     with open(filepath, 'w+', encoding='utf-8') as file:
         file.truncate(0)
         for i in worklist:
@@ -34,14 +37,8 @@ def readwechatid(filepath):
                 break
             line = line.strip('\n')
             lines.append(line)
+    lines = list(set(lines))
     return lines
-
-
-def checkuserstatus(wechatid):
-    if d.xpath('//*[@resource-id="com.tencent.mm:id/j5_"]/android.widget.ImageView[1]').exists:
-        print(wechatid, "该用户不存在")
-        d(resourceId="com.tencent.mm:id/apy").click()
-        return
 
 
 def addfriends(wechatid, success, found):
@@ -53,6 +50,7 @@ def addfriends(wechatid, success, found):
     # d(resourceId="com.tencent.mm:id/eg6").click()
     # 输入要添加的号码
     d.xpath('//*[@resource-id="com.tencent.mm:id/gfl"]').set_text(wechatid)
+    time.sleep(1)
     # #输入完毕点击下方出现的搜索:xxxxxxxxxxxx
     d.xpath('//*[@resource-id="com.tencent.mm:id/mfg"]/android.widget.RelativeLayout[1]').click()
     # 判断用户状态
@@ -79,17 +77,8 @@ def addfriends(wechatid, success, found):
     return 1
 
 
-def filterepeat():
-    result = readwechatid(r"doneId.txt")
-    result = list(set(result))
-    with open(r'doneId.txt', 'w+', encoding='utf-8') as file:
-        for i in result:
-            file.write(i + '\n')
-
-
 def main():
     phonelist = readwechatid(file_path)
-    phonelist = list(set(phonelist))
     # 点击右上角+号
     d.xpath('//*[@resource-id="com.tencent.mm:id/ky9"]').click()
     time.sleep(1)
@@ -103,15 +92,15 @@ def main():
     notfound = 1
     success = 1
     try:
-        for wechatid in phonelist:
-            if addfriends(wechatid, success, notfound):
+        for number in phonelist:
+            if addfriends(number, success, notfound):
                 success += 1
             else:
                 notfound += 1
             phonelist.pop(count)
             count += 1
     finally:
-        with open('./freshId.txt', 'w', encoding='utf-8') as done_file:
+        with open('./WeChatId.txt', 'w', encoding='utf-8') as done_file:
             done_file.truncate(0)
             for i in phonelist:
                 done_file.write(i + '\n')
@@ -134,9 +123,9 @@ if __name__ == '__main__':
     for k, value in d.info.items():
         print(f"{k}: {value}")
     # 设置申请内容
-    verifyContent = '您好，低价飞天茅台质量99.9%,对标正品，降低招待成本，提升饭桌规格！'
+    verifyContent = '您好，低价飞天，酒质高端,价格实惠，为您降低招待成本，提升饭桌规格！'
     # 主程序
-    file_path = './freshId.txt'
-    wechatid = './WeChatid.txt'
-    getwechatid(124, file_path,wechatid)
+    file_path = 'WeChatId.txt'
+    # numbertxt = './WeChatId.txt'
+    # getwechatid(240, file_path, numbertxt)
     main()
