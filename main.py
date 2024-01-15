@@ -1,11 +1,22 @@
 # coding: utf-8
 import time
+from multiprocessing import Process
 import uiautomator2 as u2
 import os
+from datetime import datetime
+import subprocess
 d = u2.connect()
 
+d.settings['wait_timeout'] = 8
+class OpenScrcpy(Process):
+    def __init__(self):
+        super().__init__()
 
+    def run(self) -> None:
+        subprocess.call('scrcpy-win64-v2.2/scrcpy.exe')
 # 读取wechatid
+
+
 def getwechatid(number, filepath, wxid):
 
     if os.path.getsize(filepath):
@@ -58,22 +69,30 @@ def addfriends(wechatid, success, found):
     time.sleep(2)
     if d(text='发消息').exists:
         print(wechatid + ' is already your friend!')
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(wechatid + ' is already your friend!\n')
         d.xpath('//*[@resource-id="com.tencent.mm:id/hf"]').click()
         return
     if not d(text='添加到通讯录').exists:
-        print(wechatid + f"  该用户不存在! found:No.{found}")
+        print(wechatid + f"  该用户不存在! not found:No.{found}")
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(wechatid + f"  该用户不存在! not found:No.{found}\n")
         return
+    if d(text='	操作过于频繁，请稍后再试').exists or d.xpath('//*[@resource-id="com.tencent.mm:id/cam"]').exists:
+        print("添加频繁！！")
+        d(resourceId="com.tencent.mm:id/b5i").click()
     # #点击接下来要进行的操作按钮 这里是点击添加到通讯录
     d(resourceId="com.tencent.mm:id/o3b").click()
     # 设置好友申请内容
     d(resourceId="com.tencent.mm:id/m9y").set_text(verifyContent)
-    time.sleep(1)
     # 点击发送
     d.xpath('//*[@resource-id="com.tencent.mm:id/g68"]').click()
-    time.sleep(3)
     # 点击返回到添加好友页面
+    time.sleep(3)
     d.press("back")
     print(wechatid + f' is add successfully! addSuccessful:No.{success}')
+    with open('log.txt', 'a+', encoding='utf-8') as file:
+        file.write(wechatid + f' is add successfully! addSuccessful:No.{success}\n')
     return 1
 
 
@@ -91,16 +110,22 @@ def main():
     count = 0
     notfound = 1
     success = 1
+    pfnumber = None
     try:
         for number in phonelist:
-            if addfriends(number, success, notfound):
-                success += 1
-            else:
-                notfound += 1
+            if number is not None:
+                if addfriends(number, success, notfound):
+                    success += 1
+                else:
+                    notfound += 1
             phonelist.pop(count)
             count += 1
+            pfnumber = number
     finally:
-        with open('./WeChatId.txt', 'w', encoding='utf-8') as done_file:
+        print(f'{pfnumber} 其实没有添加过，已经重新写入到号码源文件啦')
+        print('此次加人工作结束---------------')
+        phonelist.append(pfnumber)
+        with open('./goodluck.txt', 'w', encoding='utf-8') as done_file:
             done_file.truncate(0)
             for i in phonelist:
                 done_file.write(i + '\n')
@@ -116,6 +141,11 @@ def main():
             print(f'this time add totally {count}')
             print(f'this time add successfully {success}')
             print('file modify successfully!')
+            with open('log.txt', 'a+', encoding='utf-8') as file:
+                file.write(f'this time add totally {count}\n')
+                file.write(f'this time add successfully {success}\n')
+                file.write('file modify successfully!\n')
+                file.write(f'this time work done! {datetime.now().replace(microsecond=0)} 分割线  --------------------------------------------\n')
 
 
 if __name__ == '__main__':
@@ -123,9 +153,10 @@ if __name__ == '__main__':
     for k, value in d.info.items():
         print(f"{k}: {value}")
     # 设置申请内容
-    verifyContent = '您好，低价飞天，酒质高端,价格实惠，为您降低招待成本，提升饭桌规格！'
+    verifyContent = '您好，精仿飞天茅台，品质对标正品,价格实惠，欢迎品鉴！'
     # 主程序
-    file_path = 'WeChatId.txt'
+    # 工作文件目录 修改输入文件时切记修改输出文件！！！！
+    file_path = 'goodluck.txt'
     # numbertxt = './WeChatId.txt'
     # getwechatid(240, file_path, numbertxt)
     main()

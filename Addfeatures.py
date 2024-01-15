@@ -12,60 +12,6 @@ def readwechatid(filepath):
             lines.append(line)
     return lines
 
-
-def phonenumberchange(origin, changed):
-    newline = readwechatid(origin)
-    # int_str = [int(x) for x in newline]
-    print(newline)
-    workdone = []
-    count = 1
-    # 更改的是倒数第四位
-    # 第一次9变成8 其余加1
-    # 第二次是其余减1 9变成1
-    # 第三次其余减2 9变成0
-    # 第四其余减3 9变成2
-    # 第五次其余减4 9--> 3
-    # 第六次其余减5 9--> 4
-    # 第七次其余减6 9 --> 5
-
-    # new line 更改倒数第五位
-    # 第一轮 9变8 其余加1 9 + 9
-    # 第二轮 9--> 0 其余加2 9 +1
-    try:
-        for i in newline:
-            l = list(i)
-            if l[-5] == '9':
-                l[-5] = '0'
-            elif l[-5] == '8':
-                l[-5] = '0'
-            elif l[-5] == '7':
-                l[-5] = '9'
-            elif l[-5] == '6':
-                l[-5] = '8'
-            elif l[-5] == '5':
-                l[-5] = '7'
-            elif l[-5] == '4':
-                l[-5] = '6'
-            elif l[-5] == '3':
-                l[-5] = '5'
-            elif l[-5] == '2':
-                l[-5] = '4'
-            elif l[-5] == '1':
-                l[-5] = '3'
-            elif l[-5] == '0':
-                l[-5] = '2'
-            i = ''.join(l)
-            workdone.append(i)
-            count += 1
-    except IndexError:
-        print(f'{count} is wrong!')
-    finally:
-        print(workdone)
-        with open(changed, 'w+', encoding='utf-8') as file:
-            for i in workdone:
-                file.write(i + '\n')
-
-
 def numberfilter(file):
     result = readwechatid(file)
     result = list(set(result))
@@ -101,11 +47,6 @@ def modify_phone_number(input_file_path, output_file_path, index, amount):
     # return modified_numbers
 
 
-# newid的倒数第五位所有轮次都加过已经
-# newid的倒数第六位已经加到4 还可以加五位 加满了
-# res = modify_phone_number('newid.txt','WeChatId.txt', -6, 9)
-
-
 def filter_numbers(numbers):
     filtered_numbers = []
     pattern = r"\d{4}(\d)\1{3,4}$"  # 匹配末尾4位或5位数字相同的模式
@@ -138,3 +79,39 @@ def filter_numbers(numbers):
 #     for i in res:
 #         file.write(i + '\n')
 
+def unarymodify(index):
+    for i in range(1, 10):
+        modify_phone_number('originid.txt', 'goodluck.txt', index, i)
+
+
+def dualisticmodify(inputfile, midfile, outputfile, first, second):
+    for i in range(1, 10):
+        with open(midfile, 'w', encoding='utf-8') as file:
+            file.truncate()
+        modify_phone_number(inputfile, midfile, first, i)
+        for x in range(1, 10):
+            modify_phone_number(midfile, outputfile, second, x)
+
+
+if __name__ == "__main__":
+
+    """
+    newid.txt: 原始id
+    一元修改已全部完成
+    二元修改开始
+    第一轮 -6位+1 -5位加满
+    第二轮 -6位+2 -5位加满
+    第三轮 -6位+3 -5位加满
+    第四轮 -6位加满 -5位加满
+    """
+    """
+    originid.txt
+    一元修改：
+    -5 加满
+    -6 加满
+    -7 加满
+    -8 加满
+    二元修改开始：
+    -6 加满 -5 加满
+    """
+    dualisticmodify('originid.txt', 'mid.txt', 'goodluck.txt', 6, 5)
