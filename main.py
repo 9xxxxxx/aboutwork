@@ -46,8 +46,9 @@ def readwechatid(filepath):
             line = file_to_read.readline()
             if not line:
                 break
-            line = line.strip('\n')
-            lines.append(line)
+            line = line.strip()
+            if line:
+                lines.append(line.strip())
     lines = list(set(lines))
     return lines
 
@@ -112,21 +113,20 @@ def main():
     success = 1
     pfnumber = None
     try:
-        for number in phonelist:
-            if number is not None:
-                if addfriends(number, success, notfound):
-                    success += 1
-                else:
-                    notfound += 1
-            phonelist.pop(count)
-            count += 1
+        for number in phonelist[:]:
             pfnumber = number
+            if addfriends(number, success, notfound):
+                success += 1
+            else:
+                notfound += 1
+            phonelist.remove(number)
+            count += 1
+
     finally:
         print(f'{pfnumber} 其实没有添加过，已经重新写入到号码源文件啦')
         print('此次加人工作结束---------------')
         phonelist.append(pfnumber)
-        with open('./goodluck.txt', 'w', encoding='utf-8') as done_file:
-            done_file.truncate(0)
+        with open(file_path, 'w', encoding='utf-8') as done_file:
             for i in phonelist:
                 done_file.write(i + '\n')
             # 提示频繁或者出错 返回到微信主界面
@@ -145,7 +145,8 @@ def main():
                 file.write(f'this time add totally {count}\n')
                 file.write(f'this time add successfully {success}\n')
                 file.write('file modify successfully!\n')
-                file.write(f'this time work done! {datetime.now().replace(microsecond=0)} 分割线  --------------------------------------------\n')
+                file.write(f'this time work done! {datetime.now().replace(microsecond=0)} '
+                           f'分割线  --------------------------------------------\n')
 
 
 if __name__ == '__main__':

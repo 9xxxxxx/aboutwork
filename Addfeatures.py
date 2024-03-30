@@ -50,18 +50,25 @@ def modify_phone_number(input_file_path, output_file_path, index, amount):
 def filter_numbers(numbers):
     filtered_numbers = []
     pattern = r"\d{4}(\d)\1{3,4}$"  # 匹配末尾4位或5位数字相同的模式
+    pattern3 = r"\d{4}(\d)\1{2}$"
     pattern1 = r'^.{6}9'
+    newnumber = []
     for number in numbers:
-        if re.search(pattern1, number):
+        if re.search(pattern, number):
             filtered_numbers.append(number)
+        else:
+            newnumber.append(number)
+    with open('3set.txt', 'w') as done:
+        for i in newnumber:
+            done.write(i + '\n')
     return filtered_numbers
 
-# res = filter_numbers(readwechatid('old4.txt'))
-# # 将res的内容写入到done.txt
-# with open('done.txt', 'w') as done:
+res = filter_numbers(readwechatid('originid.txt'))
+# 将res的内容写入到done.txt
+# with open('3set.txt', 'w') as done:
 #     for i in res:
 #         done.write(i+'\n')
-# 示例输入
+
 
 
 # number = []
@@ -93,25 +100,4 @@ def dualisticmodify(inputfile, midfile, outputfile, first, second):
             modify_phone_number(midfile, outputfile, second, x)
 
 
-if __name__ == "__main__":
 
-    """
-    newid.txt: 原始id
-    一元修改已全部完成
-    二元修改开始
-    第一轮 -6位+1 -5位加满
-    第二轮 -6位+2 -5位加满
-    第三轮 -6位+3 -5位加满
-    第四轮 -6位加满 -5位加满
-    """
-    """
-    originid.txt
-    一元修改：
-    -5 加满
-    -6 加满
-    -7 加满
-    -8 加满
-    二元修改开始：
-    -6 加满 -5 加满
-    """
-    dualisticmodify('originid.txt', 'mid.txt', 'goodluck.txt', 6, 5)
