@@ -1,4 +1,5 @@
 import re
+import random
 
 
 def readwechatid(filepath):
@@ -12,21 +13,7 @@ def readwechatid(filepath):
             lines.append(line)
     return lines
 
-def numberfilter(file):
-    result = readwechatid(file)
-    result = list(set(result))
-    with open(file, 'w+', encoding='utf-8') as file:
-        file.truncate()
-        for i in result:
-            file.write(i + '\n')
 
-
-# new line 更改倒数第五位
-# 第一轮 9变8 其余加1  数值为9的已经加过9和1
-# 第二轮 9--> 0 其余加2
-# 所有的4位一样数号码倒数第五位单独改变已经用完
-
-# 现在开始倒数第六位 加1加2用过已经
 def modify_phone_number(input_file_path, output_file_path, index, amount):
     with open(input_file_path, 'r') as input_file:
         phone_numbers = input_file.readlines()
@@ -48,56 +35,46 @@ def modify_phone_number(input_file_path, output_file_path, index, amount):
 
 
 def filter_numbers(numbers):
-    filtered_numbers = []
+    filtered_numbers = []  # 4set
     pattern = r"\d{4}(\d)\1{3,4}$"  # 匹配末尾4位或5位数字相同的模式
     pattern3 = r"\d{4}(\d)\1{2}$"
     pattern1 = r'^.{6}9'
-    newnumber = []
+    newnumber = []  # 3set
     for number in numbers:
         if re.search(pattern, number):
             filtered_numbers.append(number)
         else:
             newnumber.append(number)
-    with open('3set.txt', 'w') as done:
+    with open('3set.txt', 'w', encoding='utf-8') as done:
         for i in newnumber:
             done.write(i + '\n')
-    return filtered_numbers
-
-res = filter_numbers(readwechatid('originid.txt'))
-# 将res的内容写入到done.txt
-# with open('3set.txt', 'w') as done:
-#     for i in res:
-#         done.write(i+'\n')
+    with open('4set.txt', 'w', encoding='utf-8') as done:
+        for i in filtered_numbers:
+            done.write(i + '\n')
 
 
+def numberallocate():
+    numbers = []
+    mid = []
+    with open('hc.txt', 'r', encoding='utf-8') as origin:
+        mid = origin.readlines()
+        sex = len(mid)
+        sex = int(sex)
+        sex = sex // 2
+        for i in range(sex):
+            number = random.choice(mid)
+            numbers.append(number)
+            mid.remove(number)
 
-# number = []
-# # 示例输入
-# with open('originid.txt', 'r') as file:
-#         while True:
-#             wxid = file.readline()
-#             if not wxid:
-#                 break
-#             wxid = wxid.strip('\n')
-#             number.append(wxid)
-#
-# res = filter_numbers(number)
-# with open('old4.txt', 'w', encoding='utf-8') as file:
-#     for i in res:
-#         file.write(i + '\n')
+    with open('WeChatId.txt', 'a+', encoding='utf-8') as file:
+        for i in mid:
+            file.write(i)
 
-def unarymodify(index):
-    for i in range(1, 10):
-        modify_phone_number('originid.txt', 'goodluck.txt', index, i)
-
-
-def dualisticmodify(inputfile, midfile, outputfile, first, second):
-    for i in range(1, 10):
-        with open(midfile, 'w', encoding='utf-8') as file:
-            file.truncate()
-        modify_phone_number(inputfile, midfile, first, i)
-        for x in range(1, 10):
-            modify_phone_number(midfile, outputfile, second, x)
+    with open('forhc.txt', 'a+', encoding='utf-8') as file:
+        for i in numbers:
+            file.write(i)
 
 
-
+if __name__ == '__main__':
+    numberallocate()
+    # filter_numbers(readwechatid('originid.txt'))

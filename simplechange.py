@@ -19,14 +19,18 @@ def modify_phone_number(input_file_path, output_file_path, index, amount):
             output_file.write(i + '\n')
 
 
-
-def unarymodify(input, output):
+def unarymodify(inputpath, output):
     count = 0
     for index in range(3, 7):
         for i in range(1, 10):
-            modify_phone_number(input, output, index, i)
-            count += 1
-    return count
+            modify_phone_number(inputpath, output, index, i)
+
+
+def unarymodifyfor3set(inputpath, output):
+    count = 0
+    for index in range(3, 8):
+        for i in range(1, 10):
+            modify_phone_number(inputpath, output, index, i)
 
 
 def dualisticmodify(inputfile, midfile, outputfile, first, second):
@@ -37,26 +41,43 @@ def dualisticmodify(inputfile, midfile, outputfile, first, second):
         modify_phone_number(inputfile, midfile, first, i)
         for x in range(1, 10):
             modify_phone_number(midfile, outputfile, second, x)
-            count += 1
-    return count
 
 
 if __name__ == '__main__':
-    Count = None
-    plan = input("请输入你的修改计划：\n1.单元修改\n2.双元修改\n")
-    input_path = '4set.txt'
+    input_pathfor4 = '4set.txt'
+    input_pathfor3 = '3set.txt'
     mid_path = 'mid.txt'
-    output_path = 'goodluck.txt'
-    if plan == '1':
-        Count = unarymodify(input_path, output_path)
-        with open('修改日志.txt', 'a+', encoding='utf-8') as f:
-            f.write(f"{datetime.now().replace(microsecond=0)}  文件单元修改已完毕，共生成{Count}个号码\n")
-        print(f'修改成功,共生成{Count}个新号码！！！👍👍👍')
-    elif plan == '2':
-        first = int(input('第一个修改位置😅😅😅：'))
-        second = int(input('第二个修改位置😅😅😅：'))
-        Count = dualisticmodify(input_path, mid_path, output_path, first, second)
-        with open('修改日志.txt', 'a+', encoding='utf-8') as f:
-            f.write(f"{datetime.now().replace(microsecond=0)}  文件双元修改已完毕，修改位置为{first}位和{second}位,共生成{Count}个号码\n")
-        print(f'修改成功,共生成{Count}个新号码！！！👍👍👍')
+    output_path = 'hc.txt'
+    plan = input("请输入你的修改计划：\n0.单元修改for4set.\n1.单元修改for3set.\n2.双元修改.\n")
 
+    if plan == '0':
+        # modify for 4set
+        print(f'输入源文件为{input_pathfor4},输出文件为{output_path}')
+        with open(input_pathfor4, 'r') as f:
+            lines = f.readlines()
+            line_count = len(lines)
+        unarymodify(input_pathfor4, output_path)
+        with open('修改日志.txt', 'a+', encoding='utf-8') as f:
+            f.write(f"{datetime.now().replace(microsecond=0)}  文件单元修改已完毕，共生成{line_count * 4 * 9}个号码\n")
+        print(f'修改成功,共生成{line_count * 4 * 9}个新号码！！！👍👍👍')
+
+    elif plan == '1':
+        # modify for 3set
+        print(f'输入源文件为{input_pathfor3},输出文件为{output_path}')
+        with open(input_pathfor3, 'r') as f:
+            lines = f.readlines()
+            line_count = len(lines)
+        unarymodifyfor3set(input_pathfor3, output_path)
+        with open('修改日志.txt', 'a+', encoding='utf-8') as f:
+            f.write(f"{datetime.now().replace(microsecond=0)}  文件单元修改已完毕，共生成{line_count * 5 * 9}个号码\n")
+        print(f'修改成功,共生成{line_count * 5 * 9}个新号码！！！👍👍👍')
+
+    elif plan == '2':
+        # modify for multi index
+        index1 = int(input('第一个修改位置😅😅😅：'))
+        index2 = int(input('第二个修改位置😅😅😅：'))
+        dualisticmodify(input_pathfor4, mid_path, output_path, index1, index2)
+        with open('修改日志.txt', 'a+', encoding='utf-8') as f:
+            f.write(
+                f"{datetime.now().replace(microsecond=0)}  文件双元修改已完毕，修改位置为{index1}位和{index2}位,共生成?个号码\n")
+        print(f'修改成功,共生成?个新号码！！！👍👍👍')
